@@ -101,13 +101,13 @@ metadata:
         role: pointOfContact
 
 resources:
-    surface-based-observations-synop:
+    surface-based-observations-metar:
         type: collection
-        title: Synoptic Surface Based Observations
-        description: Synoptic Surface Based Observations
+        title: METAR Surface Based Observations
+        description: METAR Surface Based Observations
         keywords:
             - observations
-            - synoptic
+            - metar
         linked-data:
             context:
                 - datetime: https://schema.org/DateTime
@@ -129,11 +129,12 @@ resources:
                 end: 2007-10-30T08:57:29Z
         providers:
             - type: feature
-              name: OBS
+              name: metar_obs
+            #   name: Elasticsearch
+              editable: false  # optional, default is false
+              minio_server: 'http://localhost:9000'
               minio_user: minio
               minio_password: minio123
-            #   data: tests/data/obs.csv
-            #   id_field: id
-            #   geometry:
-            #       x_field: long
-            #       y_field: lat
+              minio_bucket: wis2box-public
+              minio_path: <DATE>/wis/usa/noaa_nws/data/recommended/weather/surface-based-observations/metar
+              data: http://localhost:9200/usa.noaa_nws.data.recommended.weather.surface-based-observations.metar

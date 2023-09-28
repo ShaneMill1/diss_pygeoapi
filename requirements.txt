@@ -1,6 +1,10 @@
 Babel
+botocore
+boto3
 click
 filelock
+elasticsearch
+elasticsearch-dsl
 Flask
 importlib_metadata
 jinja2

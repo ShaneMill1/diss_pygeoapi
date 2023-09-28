@@ -294,7 +294,7 @@ class ElasticsearchProvider(BaseProvider):
         try:
             LOGGER.debug('querying Elasticsearch')
             if filterq:
-                LOGGER.debug(f'adding cql object: {filterq.model_dump_json()}')
+                # LOGGER.debug(f'adding cql object: {filterq.model_dump_json()}')
                 query = update_query(input_query=query, cql=filterq)
             LOGGER.debug(json.dumps(query, indent=4))
 

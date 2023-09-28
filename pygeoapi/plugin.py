@@ -48,7 +48,7 @@ PLUGINS = {
         'GeoJSON': 'pygeoapi.provider.geojson.GeoJSONProvider',
         'Hateoas': 'pygeoapi.provider.hateoas.HateoasProvider',
         'MapScript': 'pygeoapi.provider.mapscript_.MapScriptProvider',
-        'OBS': 'pygeoapi.provider.obs.SynopProvider',
+        'metar_obs': 'pygeoapi.provider.obs.MetarProvider',
         'MongoDB': 'pygeoapi.provider.mongo.MongoProvider',
         'MVT': 'pygeoapi.provider.mvt.MVTProvider',
         'OracleDB': 'pygeoapi.provider.oracle.OracleProvider',

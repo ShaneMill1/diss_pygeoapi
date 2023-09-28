@@ -52,6 +52,7 @@ from typing import Any, Tuple, Union, Optional
 import urllib.parse
 
 from dateutil.parser import parse as dateparse
+from flask import send_file
 from pygeofilter.parsers.ecql import parse as parse_ecql_text
 from pygeofilter.parsers.cql_json import parse as parse_cql_json
 from pyproj.exceptions import CRSError
@@ -2324,85 +2325,90 @@ class API:
         uri = content['properties'].get(p.uri_field) if p.uri_field else \
             f'{self.get_collections_url()}/{dataset}/items/{identifier}'
 
-        if 'links' not in content:
-            content['links'] = []
-
-        content['links'].extend([{
-            'type': FORMAT_TYPES[F_JSON],
-            'rel': 'root',
-            'title': 'The landing page of this server as JSON',
-            'href': f"{self.base_url}?f={F_JSON}"
-            }, {
-            'type': FORMAT_TYPES[F_HTML],
-            'rel': 'root',
-            'title': 'The landing page of this server as HTML',
-            'href': f"{self.base_url}?f={F_HTML}"
-            }, {
-            'rel': request.get_linkrel(F_JSON),
-            'type': 'application/geo+json',
-            'title': 'This document as GeoJSON',
-            'href': f'{uri}?f={F_JSON}'
-            }, {
-            'rel': request.get_linkrel(F_JSONLD),
-            'type': FORMAT_TYPES[F_JSONLD],
-            'title': 'This document as RDF (JSON-LD)',
-            'href': f'{uri}?f={F_JSONLD}'
-            }, {
-            'rel': request.get_linkrel(F_HTML),
-            'type': FORMAT_TYPES[F_HTML],
-            'title': 'This document as HTML',
-            'href': f'{uri}?f={F_HTML}'
-            }, {
-            'rel': 'collection',
-            'type': FORMAT_TYPES[F_JSON],
-            'title': l10n.translate(collections[dataset]['title'],
-                                    request.locale),
-            'href': f'{self.get_collections_url()}/{dataset}'
-        }])
-
-        link_request_format = (
-            request.format if request.format is not None else F_JSON
-        )
-        if 'prev' in content:
-            content['links'].append({
-                'rel': 'prev',
-                'type': FORMAT_TYPES[link_request_format],
-                'href': f"{self.get_collections_url()}/{dataset}/items/{content['prev']}?f={link_request_format}"  # noqa
-            })
-        if 'next' in content:
-            content['links'].append({
-                'rel': 'next',
-                'type': FORMAT_TYPES[link_request_format],
-                'href': f"{self.get_collections_url()}/{dataset}/items/{content['next']}?f={link_request_format}"  # noqa
-            })
-
-        # Set response language to requested provider locale
-        # (if it supports language) and/or otherwise the requested pygeoapi
-        # locale (or fallback default locale)
-        l10n.set_response_language(headers, prv_locale, request.locale)
-
-        if request.format == F_HTML:  # render
-            content['title'] = l10n.translate(collections[dataset]['title'],
-                                              request.locale)
-            content['id_field'] = p.id_field
-            if p.uri_field is not None:
-                content['uri_field'] = p.uri_field
-            if p.title_field is not None:
-                content['title_field'] = l10n.translate(p.title_field,
-                                                        request.locale)
-            content['collections_path'] = self.get_collections_url()
-
-            content = render_j2_template(self.tpl_config,
-                                         'collections/items/item.html',
-                                         content, request.locale)
+        if isinstance(content,bytes):
+            cd = f'attachment; filename={identifier}.bufr4'
+            headers['Content-Disposition'] = cd
             return headers, HTTPStatus.OK, content
+        else:
+            if 'links' not in content:
+                content['links'] = []
 
-        elif request.format == F_JSONLD:
-            content = geojson2jsonld(
-                self, content, dataset, uri, (p.uri_field or 'id')
+            content['links'].extend([{
+                'type': FORMAT_TYPES[F_JSON],
+                'rel': 'root',
+                'title': 'The landing page of this server as JSON',
+                'href': f"{self.base_url}?f={F_JSON}"
+                }, {
+                'type': FORMAT_TYPES[F_HTML],
+                'rel': 'root',
+                'title': 'The landing page of this server as HTML',
+                'href': f"{self.base_url}?f={F_HTML}"
+                }, {
+                'rel': request.get_linkrel(F_JSON),
+                'type': 'application/geo+json',
+                'title': 'This document as GeoJSON',
+                'href': f'{uri}?f={F_JSON}'
+                }, {
+                'rel': request.get_linkrel(F_JSONLD),
+                'type': FORMAT_TYPES[F_JSONLD],
+                'title': 'This document as RDF (JSON-LD)',
+                'href': f'{uri}?f={F_JSONLD}'
+                }, {
+                'rel': request.get_linkrel(F_HTML),
+                'type': FORMAT_TYPES[F_HTML],
+                'title': 'This document as HTML',
+                'href': f'{uri}?f={F_HTML}'
+                }, {
+                'rel': 'collection',
+                'type': FORMAT_TYPES[F_JSON],
+                'title': l10n.translate(collections[dataset]['title'],
+                                        request.locale),
+                'href': f'{self.get_collections_url()}/{dataset}'
+            }])
+
+            link_request_format = (
+                request.format if request.format is not None else F_JSON
             )
+            if 'prev' in content:
+                content['links'].append({
+                    'rel': 'prev',
+                    'type': FORMAT_TYPES[link_request_format],
+                    'href': f"{self.get_collections_url()}/{dataset}/items/{content['prev']}?f={link_request_format}"  # noqa
+                })
+            if 'next' in content:
+                content['links'].append({
+                    'rel': 'next',
+                    'type': FORMAT_TYPES[link_request_format],
+                    'href': f"{self.get_collections_url()}/{dataset}/items/{content['next']}?f={link_request_format}"  # noqa
+                })
 
-        return headers, HTTPStatus.OK, to_json(content, self.pretty_print)
+            # Set response language to requested provider locale
+            # (if it supports language) and/or otherwise the requested pygeoapi
+            # locale (or fallback default locale)
+            l10n.set_response_language(headers, prv_locale, request.locale)
+
+            if request.format == F_HTML:  # render
+                content['title'] = l10n.translate(collections[dataset]['title'],
+                                                request.locale)
+                content['id_field'] = p.id_field
+                if p.uri_field is not None:
+                    content['uri_field'] = p.uri_field
+                if p.title_field is not None:
+                    content['title_field'] = l10n.translate(p.title_field,
+                                                            request.locale)
+                content['collections_path'] = self.get_collections_url()
+
+                content = render_j2_template(self.tpl_config,
+                                            'collections/items/item.html',
+                                            content, request.locale)
+                return headers, HTTPStatus.OK, content
+
+            elif request.format == F_JSONLD:
+                content = geojson2jsonld(
+                    self, content, dataset, uri, (p.uri_field or 'id')
+                )
+
+            return headers, HTTPStatus.OK, to_json(content, self.pretty_print)
 
     @pre_process
     @jsonldify

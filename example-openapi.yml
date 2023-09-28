@@ -229,10 +229,10 @@ paths:
       summary: Collections
       tags:
       - server
-  /collections/surface-based-observations-synop:
+  /collections/surface-based-observations-metar:
     get:
-      description: Synoptic Surface Based Observations
-      operationId: describeSurface-based-observations-synopCollection
+      description: METAR Surface Based Observations
+      operationId: describeSurface-based-observations-metarCollection
       parameters:
       - $ref: '#/components/parameters/f'
       - $ref: '#/components/parameters/lang'
@@ -245,15 +245,16 @@ paths:
           $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/NotFound
         '500':
           $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/ServerError
-      summary: Get Synoptic Surface Based Observations metadata
+      summary: Get METAR Surface Based Observations metadata
       tags:
-      - surface-based-observations-synop
-  /collections/surface-based-observations-synop/items:
+      - surface-based-observations-metar
+  /collections/surface-based-observations-metar/items:
     get:
-      description: Synoptic Surface Based Observations
-      operationId: getSurface-based-observations-synopFeatures
+      description: METAR Surface Based Observations
+      operationId: getSurface-based-observations-metarFeatures
       parameters:
-      - description: The optional f parameter indicates the output format which the
+      - &id001
+        description: The optional f parameter indicates the output format which the
           server shall provide as part of the response document.  The default format
           is GeoJSON.
         explode: false
@@ -269,7 +270,8 @@ paths:
           - csv
           type: string
         style: form
-      - description: The optional lang parameter instructs the server return a response
+      - &id002
+        description: The optional lang parameter instructs the server return a response
           in a certain language, if supported.  If the language is not among the available
           values, the Accept-Language header language will be used if it is supported.
           If the header is missing, the default server language is used. Note that
@@ -298,7 +300,17 @@ paths:
         required: false
         schema:
           items:
-            enum: []
+            enum:
+            - fxxyyy
+            - id
+            - index
+            - name
+            - phenomenonTime
+            - pubTime
+            - resultTime
+            - station_identifier
+            - units
+            - value
             type: string
           type: array
         style: form
@@ -306,6 +318,80 @@ paths:
       - $ref: '#/components/parameters/skipGeometry'
       - $ref: https://raw.githubusercontent.com/opengeospatial/ogcapi-records/master/core/openapi/parameters/sortby.yaml
       - $ref: '#/components/parameters/offset'
+      - explode: false
+        in: query
+        name: fxxyyy
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: id
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: index
+        required: false
+        schema:
+          format: long
+          type: number
+        style: form
+      - explode: false
+        in: query
+        name: name
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: phenomenonTime
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: pubTime
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: resultTime
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: station_identifier
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: units
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: query
+        name: value
+        required: false
+        schema:
+          format: float
+          type: number
+        style: form
       responses:
         '200':
           $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/Features
@@ -315,21 +401,21 @@ paths:
           $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/NotFound
         '500':
           $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/ServerError
-      summary: Get Synoptic Surface Based Observations items
+      summary: Get METAR Surface Based Observations items
       tags:
-      - surface-based-observations-synop
+      - surface-based-observations-metar
     options:
-      operationId: optionsSurface-based-observations-synopFeatures
+      operationId: optionsSurface-based-observations-metarFeatures
       responses:
         '200':
           description: options response
-      summary: Options for Synoptic Surface Based Observations items
+      summary: Options for METAR Surface Based Observations items
       tags:
-      - surface-based-observations-synop
-  /collections/surface-based-observations-synop/items/{featureId}:
+      - surface-based-observations-metar
+  /collections/surface-based-observations-metar/items/{featureId}:
     get:
-      description: Synoptic Surface Based Observations
-      operationId: getSurface-based-observations-synopFeature
+      description: METAR Surface Based Observations
+      operationId: getSurface-based-observations-metarFeature
       parameters:
       - $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/parameters/featureId
       - $ref: '#/components/parameters/crs'
@@ -344,19 +430,38 @@ paths:
           $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/NotFound
         '500':
           $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/ServerError
-      summary: Get Synoptic Surface Based Observations item by id
+      summary: Get METAR Surface Based Observations item by id
       tags:
-      - surface-based-observations-synop
+      - surface-based-observations-metar
     options:
-      operationId: optionsSurface-based-observations-synopFeature
+      operationId: optionsSurface-based-observations-metarFeature
       parameters:
       - $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/parameters/featureId
       responses:
         '200':
           description: options response
-      summary: Options for Synoptic Surface Based Observations item by id
+      summary: Options for METAR Surface Based Observations item by id
       tags:
-      - surface-based-observations-synop
+      - surface-based-observations-metar
+  /collections/surface-based-observations-metar/queryables:
+    get:
+      description: METAR Surface Based Observations
+      operationId: getSurface-based-observations-metarQueryables
+      parameters:
+      - *id001
+      - *id002
+      responses:
+        '200':
+          $ref: '#/components/responses/Queryables'
+        '400':
+          $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/InvalidParameter
+        '404':
+          $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/NotFound
+        '500':
+          $ref: https://schemas.opengis.net/ogcapi/features/part1/1.0/openapi/ogcapi-features-1.yaml#/components/responses/ServerError
+      summary: Get METAR Surface Based Observations queryables
+      tags:
+      - surface-based-observations-metar
   /conformance:
     get:
       description: API conformance definition
@@ -414,5 +519,5 @@ tags:
   name: server
 - description: SpatioTemporal Asset Catalog
   name: stac
-- description: Synoptic Surface Based Observations
-  name: surface-based-observations-synop
+- description: METAR Surface Based Observations
+  name: surface-based-observations-metar
